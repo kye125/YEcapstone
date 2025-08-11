@@ -7,18 +7,18 @@ import { ChevronLeftIcon, XMarkIcon } from 'react-native-heroicons/outline';
 
 const API_BASE_URL = 'http://43.200.200.161:8080';
 
-// --- 서버(백엔드) 기준에 맞춘 임시 인기 재료 목록 ---
 const POPULAR_INGREDIENTS = {
-  '육류': ['돼지고기', '닭고기', '소고기', '계란', '오리고기'],
+  '육류': ['돼지고기', '닭고기', '소고기', '오리고기', '양고기'],
+  '해산물': ['오징어', '새우', '고등어', '갈치', '연어', '멸치', '조개', '게', '문어'],
   '채소': ['양파', '마늘', '대파', '감자', '당근', '고추', '깻잎', '상추', '시금치', '버섯', '오이', '토마토', '배추', '무', '애호박', '양배추'],
   '과일': ['사과', '바나나', '딸기', '레몬', '오렌지', '포도', '수박'],
-  '유제품': ['우유', '치즈', '요거트', '버터', '생크림'],
-  '가공식품': ['베이컨', '소시지', '햄', '오징어', '새우', '고등어', '참치캔', '두부', '김치', '식빵', '라면', '어묵'],
-  '기타': ['쌀', '밀가루', '설탕', '소금', '후추']
+  '향신료': ['설탕', '소금', '후추', '고춧가루', '참기름', '간장', '된장', '고추장'],
+  '축산물(유제품포함)': ['계란', '우유', '치즈', '버터', '생크림', '요거트'],
+  '가공식품': ['베이컨', '소시지', '햄', '참치캔', '두부', '김치', '식빵', '라면', '어묵']
 };
-// 카테고리 목록도 서버 기준에 맞게 수정
-const CATEGORIES = ['전체', '육류', '채소', '과일', '유제품', '가공식품', '기타'];
-// ---------------------------------------------------------
+
+const CATEGORIES = ['전체', '육류', '해산물', '채소', '과일', '향신료', '축산물(유제품포함)', '가공식품'];
+
 
 
 export default function SelectIngredientsScreen({ route, navigation }) {
@@ -71,7 +71,7 @@ export default function SelectIngredientsScreen({ route, navigation }) {
         await axios.put(`${API_BASE_URL}/api/update`, updatedUser, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        Alert.alert('냉장고 현황이 저장되었습니다.');
+        Alert.alert('성공', '냉장고 현황이 저장되었습니다.');
         navigation.goBack();
     } catch (error) {
         console.error('Failed to update ingredients:', error);
@@ -87,7 +87,7 @@ export default function SelectIngredientsScreen({ route, navigation }) {
       if (activeCategory === '전체') {
         listToRender = Object.values(POPULAR_INGREDIENTS).flat();
       } else {
-        listToRender = POPULAR_INGREDIENTS[activeCategory];
+        listToRender = POPULAR_INGREDIENTS[activeCategory] || [];
       }
     }
 
@@ -119,7 +119,7 @@ export default function SelectIngredientsScreen({ route, navigation }) {
 
       <View style={styles.searchContainer}>
         <TextInput
-          placeholder="재료 검색"
+          placeholder="재료 검색 (인기 재료 외)"
           value={search}
           onChangeText={setSearch}
           style={styles.searchInput}
@@ -158,6 +158,7 @@ export default function SelectIngredientsScreen({ route, navigation }) {
         {loading ? <ActivityIndicator size="large" color="#4b5563" /> : renderIngredients()}
       </ScrollView>
 
+      
       <View style={styles.selectedItemsContainerWrapper}>
         <Text style={styles.selectedItemsTitle}>나의 냉장고:</Text>
         <ScrollView style={styles.selectedItemsScroll} contentContainerStyle={styles.selectedItemsList}>
